@@ -19,8 +19,8 @@ Only users listed in `ADMIN_TELEGRAM_IDS` can use the bot. Handlers also require
 - `Volume up` -> `wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+`
 - `Volume down` -> `wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-`
 - `Mute` -> `wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle`
-- `Poweroff` -> `systemctl poweroff`
-- `Reboot` -> `systemctl reboot`
+- `Poweroff` -> `sudo -n /usr/bin/systemctl poweroff`
+- `Reboot` -> `sudo -n /usr/bin/systemctl reboot`
 
 The bot registers slash commands for private chats and shows a two-row reply keyboard:
 
@@ -32,3 +32,13 @@ The bot registers slash commands for private chats and shows a two-row reply key
 ```bash
 uv run python main.py
 ```
+
+## Raspberry Pi permissions
+
+Power actions require non-interactive root privileges. Add a sudoers rule for the user that runs the bot:
+
+```sudoers
+botuser ALL=(root) NOPASSWD: /usr/bin/systemctl poweroff, /usr/bin/systemctl reboot
+```
+
+Replace `botuser` with the actual service user. The bot uses `sudo -n`, so it will fail fast instead of waiting for a password prompt.

@@ -19,8 +19,8 @@ Build an aiogram 3 Telegram bot that lets configured admins control Raspberry Pi
   - `wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+`
   - `wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-`
   - `wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle`
-  - `systemctl poweroff`
-  - `systemctl reboot`
+  - `sudo -n /usr/bin/systemctl poweroff`
+  - `sudo -n /usr/bin/systemctl reboot`
 
 ## Architecture
 

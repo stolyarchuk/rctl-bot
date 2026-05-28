@@ -20,8 +20,18 @@ def test_action_commands_are_fixed_argv_lists() -> None:
         "@DEFAULT_AUDIO_SINK@",
         "toggle",
     )
-    assert ACTION_COMMANDS[ActionText.POWEROFF] == ("systemctl", "poweroff")
-    assert ACTION_COMMANDS[ActionText.REBOOT] == ("systemctl", "reboot")
+    assert ACTION_COMMANDS[ActionText.POWEROFF] == (
+        "sudo",
+        "-n",
+        "/usr/bin/systemctl",
+        "poweroff",
+    )
+    assert ACTION_COMMANDS[ActionText.REBOOT] == (
+        "sudo",
+        "-n",
+        "/usr/bin/systemctl",
+        "reboot",
+    )
 
 
 def test_command_for_text_returns_none_for_unknown_text() -> None:

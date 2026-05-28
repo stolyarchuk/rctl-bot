@@ -12,7 +12,7 @@ This is a Python aiogram 3 Raspberry Pi control bot.
 - `rctl_bot/bot.py` wires settings, aiogram `Bot`, `Dispatcher`, command registration, and polling.
 - `rctl_bot/handlers/` contains aiogram routers and message handlers.
 - `rctl_bot/config.py` owns pydantic settings and `.env` loading.
-- `rctl_bot/commands.py` keeps the fixed `wpctl` and `systemctl` argv mappings.
+- `rctl_bot/commands.py` keeps the fixed `wpctl` and non-interactive `sudo -n /usr/bin/systemctl` argv mappings.
 - `rctl_bot/keyboards.py` builds reply keyboards.
 - `rctl_bot/filters.py` contains admin/private-chat filters.
 - `rctl_bot/services/` contains side-effecting service wrappers.
