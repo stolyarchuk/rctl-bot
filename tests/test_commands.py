@@ -20,6 +20,7 @@ def test_action_commands_are_fixed_argv_lists() -> None:
         "@DEFAULT_AUDIO_SINK@",
         "toggle",
     )
+    assert ACTION_COMMANDS[ActionText.UNMUTE] == ACTION_COMMANDS[ActionText.MUTE]
     assert ACTION_COMMANDS[ActionText.POWEROFF] == (
         "sudo",
         "-n",
@@ -36,6 +37,7 @@ def test_action_commands_are_fixed_argv_lists() -> None:
 
 def test_command_for_text_returns_none_for_unknown_text() -> None:
     assert command_for_text(ActionText.MUTE) == ACTION_COMMANDS[ActionText.MUTE]
+    assert command_for_text(ActionText.UNMUTE) == ACTION_COMMANDS[ActionText.MUTE]
     assert command_for_text("unknown") is None
 
 

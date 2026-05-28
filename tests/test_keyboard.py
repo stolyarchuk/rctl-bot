@@ -19,3 +19,11 @@ def test_controls_keyboard_has_two_expected_rows() -> None:
         ],
     ]
     assert keyboard.resize_keyboard is True
+
+
+def test_controls_keyboard_uses_unmute_when_sink_is_muted() -> None:
+    keyboard = build_controls_keyboard(muted=True)
+
+    rows = [[button.text for button in row] for row in keyboard.keyboard]
+
+    assert rows[0][2] == ActionText.UNMUTE

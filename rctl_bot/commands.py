@@ -10,6 +10,7 @@ class ActionText:
     VOLUME_UP = "Volume up"
     VOLUME_DOWN = "Volume down"
     MUTE = "Mute"
+    UNMUTE = "Unmute"
     POWEROFF = "Poweroff"
     REBOOT = "Reboot"
 
@@ -18,6 +19,7 @@ ACTION_COMMANDS: Mapping[str, CommandArgv] = {
     ActionText.VOLUME_UP: ("wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+"),
     ActionText.VOLUME_DOWN: ("wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-"),
     ActionText.MUTE: ("wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"),
+    ActionText.UNMUTE: ("wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"),
     ActionText.POWEROFF: ("sudo", "-n", "/usr/bin/systemctl", "poweroff"),
     ActionText.REBOOT: ("sudo", "-n", "/usr/bin/systemctl", "reboot"),
 }

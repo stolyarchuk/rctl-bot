@@ -1,16 +1,16 @@
 import asyncio
 
 from rctl_bot.commands import ACTION_COMMANDS, VOLUME_STATE_COMMAND, ActionText
-from rctl_bot.handlers.controls import run_action
+from rctl_bot.handlers.controls import MuteState, read_mute_state, run_action
 from rctl_bot.services.command_runner import CommandResult
 
 
 class FakeMessage:
     def __init__(self) -> None:
-        self.answers: list[str] = []
+        self.answers: list[tuple[str, object | None]] = []
 
-    async def answer(self, text: str) -> None:
-        self.answers.append(text)
+    async def answer(self, text: str, reply_markup: object | None = None) -> None:
+        self.answers.append((text, reply_markup))
 
 
 class FakeCommandRunner:
@@ -35,7 +35,7 @@ def test_volume_up_replies_with_new_volume_level() -> None:
     asyncio.run(run_action(message, ActionText.VOLUME_UP, runner))
 
     assert runner.calls == [ACTION_COMMANDS[ActionText.VOLUME_UP], VOLUME_STATE_COMMAND]
-    assert message.answers == ["Volume: 55%"]
+    assert message.answers == [("Volume: 55%", None)]
 
 
 def test_volume_down_replies_with_new_volume_level() -> None:
@@ -50,10 +50,36 @@ def test_volume_down_replies_with_new_volume_level() -> None:
     asyncio.run(run_action(message, ActionText.VOLUME_DOWN, runner))
 
     assert runner.calls == [ACTION_COMMANDS[ActionText.VOLUME_DOWN], VOLUME_STATE_COMMAND]
-    assert message.answers == ["Volume: 30%"]
+    assert message.answers == [("Volume: 30%", None)]
 
 
-def test_mute_replies_with_mute_on_when_sink_is_muted() -> None:
+def test_read_mute_state_returns_true_when_sink_is_muted() -> None:
+    runner = FakeCommandRunner(
+        [
+            CommandResult(returncode=0, stdout="Volume: 0.55 [MUTED]\n", stderr=""),
+        ]
+    )
+
+    muted = asyncio.run(read_mute_state(runner))
+
+    assert runner.calls == [VOLUME_STATE_COMMAND]
+    assert muted is True
+
+
+def test_read_mute_state_returns_false_when_sink_is_not_muted() -> None:
+    runner = FakeCommandRunner(
+        [
+            CommandResult(returncode=0, stdout="Volume: 0.55\n", stderr=""),
+        ]
+    )
+
+    muted = asyncio.run(read_mute_state(runner))
+
+    assert runner.calls == [VOLUME_STATE_COMMAND]
+    assert muted is False
+
+
+def test_mute_updates_button_to_unmute_without_mute_status_reply() -> None:
     message = FakeMessage()
     runner = FakeCommandRunner(
         [
@@ -61,14 +87,18 @@ def test_mute_replies_with_mute_on_when_sink_is_muted() -> None:
             CommandResult(returncode=0, stdout="Volume: 0.55 [MUTED]\n", stderr=""),
         ]
     )
+    mute_state = MuteState(muted=False)
 
-    asyncio.run(run_action(message, ActionText.MUTE, runner))
+    asyncio.run(run_action(message, ActionText.MUTE, runner, mute_state))
 
     assert runner.calls == [ACTION_COMMANDS[ActionText.MUTE], VOLUME_STATE_COMMAND]
-    assert message.answers == ["Mute: on"]
+    assert mute_state.muted is True
+    assert message.answers[0][0] != "Mute: on"
+    keyboard = message.answers[0][1]
+    assert keyboard.keyboard[0][2].text == ActionText.UNMUTE
 
 
-def test_mute_replies_with_mute_off_when_sink_is_not_muted() -> None:
+def test_unmute_updates_button_to_mute_without_mute_status_reply() -> None:
     message = FakeMessage()
     runner = FakeCommandRunner(
         [
@@ -76,8 +106,12 @@ def test_mute_replies_with_mute_off_when_sink_is_not_muted() -> None:
             CommandResult(returncode=0, stdout="Volume: 0.55\n", stderr=""),
         ]
     )
+    mute_state = MuteState(muted=True)
 
-    asyncio.run(run_action(message, ActionText.MUTE, runner))
+    asyncio.run(run_action(message, ActionText.UNMUTE, runner, mute_state))
 
     assert runner.calls == [ACTION_COMMANDS[ActionText.MUTE], VOLUME_STATE_COMMAND]
-    assert message.answers == ["Mute: off"]
+    assert mute_state.muted is False
+    assert message.answers[0][0] != "Mute: off"
+    keyboard = message.answers[0][1]
+    assert keyboard.keyboard[0][2].text == ActionText.MUTE
