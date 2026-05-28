@@ -17,7 +17,7 @@ from rctl_bot.filters import AdminFilter, PrivateChatFilter
 from rctl_bot.keyboards import build_controls_keyboard
 from rctl_bot.services.command_runner import CommandRunner
 
-MUTE_KEYBOARD_REFRESH_TEXT = "\u2060"
+CONTROLS_READY_TEXT = "Raspberry Pi controls are ready."
 
 
 @dataclass
@@ -39,7 +39,7 @@ def create_controls_router(
     @router.message(Command("start"))
     async def start(message: Message) -> None:
         await message.answer(
-            "Raspberry Pi controls are ready.",
+            CONTROLS_READY_TEXT,
             reply_markup=build_controls_keyboard(muted=mute_state.muted),
         )
 
@@ -105,11 +105,10 @@ async def run_action(
             muted = is_muted(state_result.stdout)
             if mute_state is not None:
                 mute_state.muted = muted
-            keyboard_message = await message.answer(
-                MUTE_KEYBOARD_REFRESH_TEXT,
+            await message.answer(
+                CONTROLS_READY_TEXT,
                 reply_markup=build_controls_keyboard(muted=muted),
             )
-            await keyboard_message.delete()
             return
 
         reply = format_audio_state_reply(action_text, state_result.stdout)
