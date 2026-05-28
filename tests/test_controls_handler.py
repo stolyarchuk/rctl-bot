@@ -8,9 +8,24 @@ from rctl_bot.services.command_runner import CommandResult
 class FakeMessage:
     def __init__(self) -> None:
         self.answers: list[tuple[str, object | None]] = []
+        self.deleted_answers: list[tuple[str, object | None]] = []
 
     async def answer(self, text: str, reply_markup: object | None = None) -> None:
+        answer = FakeAnswer(self, text, reply_markup)
         self.answers.append((text, reply_markup))
+        return answer
+
+
+class FakeAnswer:
+    def __init__(self, message: FakeMessage, text: str, reply_markup: object | None) -> None:
+        self.message = message
+        self.text = text
+        self.reply_markup = reply_markup
+
+    async def delete(self) -> None:
+        answer = (self.text, self.reply_markup)
+        self.message.answers.remove(answer)
+        self.message.deleted_answers.append(answer)
 
 
 class FakeCommandRunner:
@@ -93,8 +108,8 @@ def test_mute_updates_button_to_unmute_without_mute_status_reply() -> None:
 
     assert runner.calls == [ACTION_COMMANDS[ActionText.MUTE], VOLUME_STATE_COMMAND]
     assert mute_state.muted is True
-    assert message.answers[0][0] != "Mute: on"
-    keyboard = message.answers[0][1]
+    assert message.answers == []
+    keyboard = message.deleted_answers[0][1]
     assert keyboard.keyboard[0][2].text == ActionText.UNMUTE
 
 
@@ -112,6 +127,6 @@ def test_unmute_updates_button_to_mute_without_mute_status_reply() -> None:
 
     assert runner.calls == [ACTION_COMMANDS[ActionText.MUTE], VOLUME_STATE_COMMAND]
     assert mute_state.muted is False
-    assert message.answers[0][0] != "Mute: off"
-    keyboard = message.answers[0][1]
+    assert message.answers == []
+    keyboard = message.deleted_answers[0][1]
     assert keyboard.keyboard[0][2].text == ActionText.MUTE

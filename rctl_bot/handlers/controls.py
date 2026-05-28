@@ -105,10 +105,11 @@ async def run_action(
             muted = is_muted(state_result.stdout)
             if mute_state is not None:
                 mute_state.muted = muted
-            await message.answer(
+            keyboard_message = await message.answer(
                 MUTE_KEYBOARD_REFRESH_TEXT,
                 reply_markup=build_controls_keyboard(muted=muted),
             )
+            await keyboard_message.delete()
             return
 
         reply = format_audio_state_reply(action_text, state_result.stdout)
