@@ -3,6 +3,7 @@ from typing import TypeAlias
 
 
 CommandArgv: TypeAlias = tuple[str, ...]
+VOLUME_STATE_COMMAND: CommandArgv = ("wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@")
 
 
 class ActionText:
