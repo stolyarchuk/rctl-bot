@@ -19,6 +19,7 @@ def test_controls_keyboard_has_two_expected_rows() -> None:
         ],
     ]
     assert keyboard.resize_keyboard is True
+    assert keyboard.is_persistent is True
 
 
 def test_controls_keyboard_uses_unmute_when_sink_is_muted() -> None:

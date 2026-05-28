@@ -17,5 +17,6 @@ def build_controls_keyboard(muted: bool = False) -> ReplyKeyboardMarkup:
                 KeyboardButton(text=ActionText.REBOOT),
             ],
         ],
+        is_persistent=True,
         resize_keyboard=True,
     )
