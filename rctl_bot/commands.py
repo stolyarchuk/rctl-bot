@@ -1,8 +1,15 @@
 from collections.abc import Mapping
 from typing import TypeAlias
 
-
 CommandArgv: TypeAlias = tuple[str, ...]
+
+INITIAL_VOLUME_COMMAND: CommandArgv = (
+    "wpctl",
+    "set-volume",
+    "@DEFAULT_AUDIO_SINK@",
+    "60%",
+)
+
 VOLUME_STATE_COMMAND: CommandArgv = ("wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@")
 
 
